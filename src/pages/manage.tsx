@@ -1,10 +1,12 @@
 import { CrossLink, Layout } from './layout';
+import { BrandBar } from './brand';
 import { EditModal } from './editModal';
 import type { AlbumSummary } from '../shared/albums';
 
 export function ManagePage({ albums }: { albums: AlbumSummary[] }): JSX.Element {
   return (
     <Layout title="Manage albums — Stockholm Pride Gallery" scripts={['htmx', 'app', 'edit']}>
+      <BrandBar />
       <main>
         <h1>
           Manage albums <CrossLink href="/api/upload-page" label="Upload photos →" />

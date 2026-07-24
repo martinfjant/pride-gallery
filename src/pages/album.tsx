@@ -1,4 +1,5 @@
 import { Layout } from './layout';
+import { BrandBar } from './brand';
 import { imageUrl } from '../shared/imageUrl';
 
 export type AlbumInfo = { slug: string; name: string; description: string };
@@ -8,6 +9,7 @@ export function AlbumPage({ album, photos }: { album: AlbumInfo | null; photos: 
   if (!album) {
     return (
       <Layout title="Album not found — Stockholm Pride Gallery">
+        <BrandBar />
         <main>
           <a href="/" class="back">← All albums</a>
           <h1>Album not found</h1>
@@ -18,6 +20,7 @@ export function AlbumPage({ album, photos }: { album: AlbumInfo | null; photos: 
 
   return (
     <Layout title={`${album.name} — Stockholm Pride Gallery`}>
+      <BrandBar />
       <main>
         <a href="/" class="back">← All albums</a>
         <h1 safe>{album.name}</h1>

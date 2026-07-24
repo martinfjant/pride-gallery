@@ -39,6 +39,27 @@ async function serveStaticAsset(filename: string, contentType: string, templated
   };
 }
 
+const binaryCache = new Map<string, Buffer>();
+
+// Binary assets (fonts) can't go through serveStaticAsset — that reads utf-8 and
+// would corrupt the bytes. Fonts are content-hashed by us and immutable, so they
+// get a long, immutable cache lifetime rather than the 5-minute one above.
+async function serveStaticBinary(filename: string, contentType: string): Promise<HttpResponseInit> {
+  let buf = binaryCache.get(filename);
+  if (buf === undefined) {
+    buf = await readFile(join(process.cwd(), 'public', filename));
+    binaryCache.set(filename, buf);
+  }
+  return {
+    status: 200,
+    headers: {
+      'content-type': contentType,
+      'cache-control': 'public, max-age=31536000, immutable',
+    },
+    body: buf,
+  };
+}
+
 async function galleryIndexHandler(): Promise<HttpResponseInit> {
   const albums = await listAlbumsData();
   const summaries = await Promise.all(albums.map(async (album) => {
@@ -131,6 +152,20 @@ app.http('styles', {
   authLevel: 'anonymous',
   route: 'api/styles.css',
   handler: () => serveStaticAsset('styles.css', 'text/css; charset=utf-8', false),
+});
+
+app.http('fontBricolageLatin', {
+  methods: ['GET'],
+  authLevel: 'anonymous',
+  route: 'api/fonts/bricolage-grotesque-latin.woff2',
+  handler: () => serveStaticBinary('fonts/bricolage-grotesque-latin.woff2', 'font/woff2'),
+});
+
+app.http('fontBricolageLatinExt', {
+  methods: ['GET'],
+  authLevel: 'anonymous',
+  route: 'api/fonts/bricolage-grotesque-latin-ext.woff2',
+  handler: () => serveStaticBinary('fonts/bricolage-grotesque-latin-ext.woff2', 'font/woff2'),
 });
 
 app.http('albumScript', {

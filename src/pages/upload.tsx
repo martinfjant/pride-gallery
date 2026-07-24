@@ -1,4 +1,5 @@
 import { CrossLink, Layout } from './layout';
+import { BrandBar } from './brand';
 import { EditModal } from './editModal';
 import type { AlbumSummary } from '../shared/albums';
 
@@ -6,6 +7,7 @@ export function UploadPage({ albums, selectedSlug }: { albums: AlbumSummary[]; s
   const hasSelection = !!selectedSlug && albums.some((a) => a.slug === selectedSlug);
   return (
     <Layout title="Upload — Stockholm Pride Gallery" scripts={['htmx', 'app', 'edit']}>
+      <BrandBar />
       <main>
         <h1>
           Upload photos <CrossLink href="/api/manage-page" label="Manage albums →" />
