@@ -8,6 +8,7 @@ import { ManagePage } from '../pages/manage';
 import { ManageAlbumPanel } from '../pages/managePanel';
 import { listAlbumsData } from '../shared/albums';
 import { listPhotosData } from '../shared/photos';
+import { photoHasAvif } from '../shared/storage';
 import { ASSETS, Asset } from '../shared/assets';
 
 function serveHtml(element: JSX.Element): HttpResponseInit {
@@ -31,6 +32,11 @@ function serveAsset(asset: Asset): HttpResponseInit {
       // lets Front Door serve these gzip/brotli-compressed — compression on
       // Front Door only applies to cacheable routes.
       'cache-control': 'public, max-age=31536000, immutable',
+      // Explicit Content-Length makes the Functions host send a fixed-length
+      // response instead of Transfer-Encoding: chunked. Front Door does NOT
+      // compress chunked-transfer responses, so without this the gzip/brotli
+      // edge compression on the app-assets route silently never kicks in.
+      'content-length': asset.byteLength.toString(),
     },
     body: asset.body,
   };
@@ -62,7 +68,7 @@ async function galleryIndexHandler(): Promise<HttpResponseInit> {
   const summaries = await Promise.all(albums.map(async (album) => {
     const photos = await listPhotosData(album.slug);
     const ready = photos.filter((p) => p.status === 'ready' && p.thumbnailBlob);
-    return { ...album, count: ready.length, coverRowKey: ready[0]?.rowKey };
+    return { ...album, count: ready.length, coverRowKey: ready[0]?.rowKey, coverHasAvif: ready[0] ? photoHasAvif(ready[0]) : false };
   }));
   return serveHtml(IndexPage({ albums: summaries }));
 }
@@ -78,7 +84,7 @@ async function galleryAlbumHandler(slug: string): Promise<HttpResponseInit> {
   const ready = photos
     .filter((p) => p.status === 'ready' && p.thumbnailBlob && p.rowKey)
     .sort((a, b) => ((a.uploadedAt ?? '') < (b.uploadedAt ?? '') ? -1 : 1))
-    .map((p) => ({ rowKey: p.rowKey as string, photographer: p.photographer }));
+    .map((p) => ({ rowKey: p.rowKey as string, photographer: p.photographer, hasAvif: photoHasAvif(p) }));
 
   return serveHtml(AlbumPage({ album, photos: ready }));
 }

@@ -4,7 +4,7 @@ import { imageUrl } from '../shared/imageUrl';
 import { assetUrl } from '../shared/assets';
 
 export type AlbumInfo = { slug: string; name: string; description: string };
-export type AlbumPhoto = { rowKey: string; photographer?: string };
+export type AlbumPhoto = { rowKey: string; photographer?: string; hasAvif?: boolean };
 
 export function AlbumPage({ album, photos }: { album: AlbumInfo | null; photos: AlbumPhoto[] }): JSX.Element {
   if (!album) {
@@ -35,16 +35,29 @@ export function AlbumPage({ album, photos }: { album: AlbumInfo | null; photos: 
                 <a
                   href={imageUrl('display', album.slug, photo.rowKey, 'jpg')}
                   data-index={i}
+                  {...(photo.hasAvif ? { 'data-display-url-avif': imageUrl('display', album.slug, photo.rowKey, 'avif') } : {})}
                   data-display-url-webp={imageUrl('display', album.slug, photo.rowKey, 'webp')}
                   data-display-url-jpg={imageUrl('display', album.slug, photo.rowKey, 'jpg')}
                   data-photographer={photo.photographer ?? ''}
                 >
                   <picture>
+                    {photo.hasAvif ? (
+                      <source srcset={imageUrl('thumbnails', album.slug, photo.rowKey, 'avif')} type="image/avif" />
+                    ) : (
+                      ''
+                    )}
                     <source srcset={imageUrl('thumbnails', album.slug, photo.rowKey, 'webp')} type="image/webp" />
                     <img
                       src={imageUrl('thumbnails', album.slug, photo.rowKey, 'jpg')}
                       alt={photo.photographer ? `Photo by ${photo.photographer}` : ''}
-                      loading="lazy"
+                      {...(i === 0
+                        // The first thumbnail is the LCP element on an album page.
+                        // Loading it eagerly (not lazy) and hinting high fetch
+                        // priority lets the browser start it immediately instead of
+                        // discovering it late — fixes Lighthouse's "LCP lazily
+                        // loaded" + "fetchpriority=high" flags. All others stay lazy.
+                        ? { loading: 'eager', fetchpriority: 'high' }
+                        : { loading: 'lazy' })}
                     />
                   </picture>
                 </a>

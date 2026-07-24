@@ -11,19 +11,27 @@ const thumbs = gridEl ? Array.from(gridEl.querySelectorAll('a')) : [];
 let currentIndex = 0;
 let currentThumb = null;
 
-function detectWebpSupport() {
+// Feature-detect a format by decoding a 1x1 sample; resolves false if the
+// browser can't. Used to pick the lightbox's full-view source (the grid thumbs
+// use <picture>, which negotiates on its own).
+function detectFormat(dataUri) {
   return new Promise((resolve) => {
     const img = new Image();
     img.onload = () => resolve(img.width === 1);
     img.onerror = () => resolve(false);
-    img.src = 'data:image/webp;base64,UklGRiIAAABXRUJQVlA4IBYAAAAwAQCdASoBAAEAAwA0JaQAA3AA/vuUAAA=';
+    img.src = dataUri;
   });
 }
 
-const webpSupported = await detectWebpSupport();
+const [avifSupported, webpSupported] = await Promise.all([
+  detectFormat('data:image/avif;base64,AAAAIGZ0eXBhdmlmAAAAAGF2aWZtaWYxbWlhZk1BMUIAAADybWV0YQAAAAAAAAAoaGRscgAAAAAAAAAAcGljdAAAAAAAAAAAAAAAAGxpYmF2aWYAAAAADnBpdG0AAAAAAAEAAAAeaWxvYwAAAABEAAABAAEAAAABAAABGgAAAB0AAAAoaWluZgAAAAAAAQAAABppbmZlAgAAAAABAABhdjAxQ29sb3IAAAAAamlwcnAAAABLaXBjbwAAABRpc3BlAAAAAAAAAAEAAAABAAAAEHBpeGkAAAAAAwgICAAAAAxhdjFDgQ0MAAAAABNjb2xybmNseAACAAIABoAAAAAXaXBtYQAAAAAAAAABAAEEAQKDBAAAACVtZGF0EgAKCBgABogQEDQgMgkQAAAAB8dSLfI='),
+  detectFormat('data:image/webp;base64,UklGRiIAAABXRUJQVlA4IBYAAAAwAQCdASoBAAEAAwA0JaQAA3AA/vuUAAA='),
+]);
 
 function displayUrl(thumb) {
-  return webpSupported ? thumb.dataset.displayUrlWebp : thumb.dataset.displayUrlJpg;
+  if (avifSupported && thumb.dataset.displayUrlAvif) return thumb.dataset.displayUrlAvif;
+  if (webpSupported) return thumb.dataset.displayUrlWebp;
+  return thumb.dataset.displayUrlJpg;
 }
 
 function runTransition(mutate) {

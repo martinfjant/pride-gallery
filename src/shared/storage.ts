@@ -73,6 +73,19 @@ export type PhotoEntity = {
   uploadedAt: string;
   processedAt?: string;
   errorMessage?: string;
+  // Which rendition pipeline produced this photo's derived images. Bumped when
+  // the set of formats changes so pages emit only formats that actually exist —
+  // a <picture> that offers an AVIF <source> with no blob behind it shows a
+  // broken image (browsers don't fall back on a 404). See photoHasAvif.
+  pipelineVersion?: number;
 };
+
+// v2 added AVIF alongside JPEG+WebP. Absent/v1 = JPEG+WebP only (pre-AVIF).
+export const IMAGE_PIPELINE_VERSION = 2;
+
+/** True when this photo's derived images include AVIF renditions. */
+export function photoHasAvif(p: { pipelineVersion?: number }): boolean {
+  return (p.pipelineVersion ?? 1) >= 2;
+}
 
 export type Focal = { x: number; y: number };

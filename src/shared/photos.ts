@@ -20,6 +20,7 @@ export async function listPhotosData(album?: string): Promise<Array<Partial<Phot
       focalY: entity.focalY,
       status: entity.status,
       uploadedAt: entity.uploadedAt,
+      pipelineVersion: entity.pipelineVersion,
     });
   }
   return photos;

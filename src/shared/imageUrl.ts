@@ -1,5 +1,5 @@
 export type ImageContainer = 'originals' | 'thumbnails' | 'display';
-export type ImageFormat = 'jpg' | 'webp';
+export type ImageFormat = 'jpg' | 'webp' | 'avif';
 
 export function imageBase(): string {
   return process.env.PUBLIC_IMAGE_BASE ?? '/api/image';

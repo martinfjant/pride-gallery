@@ -9,10 +9,12 @@ export async function purgePhoto(table: TableClient, entity: PhotoEntity, contex
   if (entity.thumbnailBlob) {
     blobTargets.push({ container: containers.thumbnails(), name: entity.thumbnailBlob });
     blobTargets.push({ container: containers.thumbnails(), name: entity.thumbnailBlob.replace(/\.jpg$/i, '.webp') });
+    blobTargets.push({ container: containers.thumbnails(), name: entity.thumbnailBlob.replace(/\.jpg$/i, '.avif') });
   }
   if (entity.displayBlob) {
     blobTargets.push({ container: containers.display(), name: entity.displayBlob });
     blobTargets.push({ container: containers.display(), name: entity.displayBlob.replace(/\.jpg$/i, '.webp') });
+    blobTargets.push({ container: containers.display(), name: entity.displayBlob.replace(/\.jpg$/i, '.avif') });
   }
 
   const warnings: string[] = [];

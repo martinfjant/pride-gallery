@@ -7,6 +7,7 @@ export type AlbumSummary = {
   description: string;
   count: number;
   coverRowKey?: string;
+  coverHasAvif?: boolean;
 };
 
 // Brand shapes, taken verbatim from Stockholm Pride's 2026 asset kit so the
@@ -119,7 +120,7 @@ export function IndexPage({ albums }: { albums: AlbumSummary[] }): JSX.Element {
               </span>
             </div>
             <ul class="albums">
-              {albums.map((album) => (
+              {albums.map((album, i) => (
                 <li>
                   {/* Two nested squircle-clipped layers: the <a> is the 1px
                       border ring (border colour + padding), .card-inner is the
@@ -131,11 +132,27 @@ export function IndexPage({ albums }: { albums: AlbumSummary[] }): JSX.Element {
                       <div class="cover">
                         {album.coverRowKey ? (
                           <picture>
+                            {album.coverHasAvif ? (
+                              <source
+                                srcset={imageUrl('thumbnails', album.slug, album.coverRowKey, 'avif')}
+                                type="image/avif"
+                              />
+                            ) : (
+                              ''
+                            )}
                             <source
                               srcset={imageUrl('thumbnails', album.slug, album.coverRowKey, 'webp')}
                               type="image/webp"
                             />
-                            <img src={imageUrl('thumbnails', album.slug, album.coverRowKey, 'jpg')} alt="" loading="lazy" />
+                            <img
+                              src={imageUrl('thumbnails', album.slug, album.coverRowKey, 'jpg')}
+                              alt=""
+                              {...(i === 0
+                                // First album cover is the LCP candidate on the gallery
+                                // index — load it eagerly with high priority; rest lazy.
+                                ? { loading: 'eager', fetchpriority: 'high' }
+                                : { loading: 'lazy' })}
+                            />
                           </picture>
                         ) : (
                           'No photos yet'

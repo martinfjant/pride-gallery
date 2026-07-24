@@ -42,6 +42,10 @@ export interface Asset {
   route: string;
   contentType: string;
   body: string;
+  /** Byte length of `body`. Sent as Content-Length so the Functions host emits
+   *  a fixed-length (not chunked) response — Front Door won't compress a
+   *  chunked-transfer response, so this is required for gzip/brotli at the edge. */
+  byteLength: number;
 }
 
 /**
@@ -56,11 +60,17 @@ function buildManifest(): Map<string, Asset> {
     const hash = createHash('sha256').update(body).digest('hex').slice(0, 8);
     const dot = def.key.lastIndexOf('.');
     const hashedName = `${def.key.slice(0, dot)}.${hash}${def.key.slice(dot)}`;
+    // Served under a dedicated /api/assets/ prefix so a single Front Door route
+    // (/api/assets/*) can cache + compress exactly these files. Front Door
+    // patternsToMatch only allows a whole-segment tail wildcard, so a prefix is
+    // the only way to select them as a group (an extension glob like
+    // /api/*.css is rejected at deploy time).
     manifest.set(def.key, {
-      url: `/api/${hashedName}`,
-      route: `api/${hashedName}`,
+      url: `/api/assets/${hashedName}`,
+      route: `api/assets/${hashedName}`,
       contentType: def.contentType,
       body,
+      byteLength: Buffer.byteLength(body),
     });
   }
   return manifest;
