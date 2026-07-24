@@ -65,6 +65,15 @@ export function IndexPage({ albums }: { albums: AlbumSummary[] }): JSX.Element {
         <Wiggly cls="w4" />
         <Wiggly cls="w5" />
         <Wiggly cls="w6" />
+        <Wiggly cls="w7" />
+        <Wiggly cls="w8" />
+        <Wiggly cls="w9" />
+        <Wiggly cls="w10" />
+        <Wiggly cls="w11" />
+        <Wiggly cls="w12" />
+        <Wiggly cls="w13" />
+        <Wiggly cls="w14" />
+        <Wiggly cls="w15" />
         <div class="hero-inner">
           <div class="hero-lockup">
             <h1 class="wordmark">

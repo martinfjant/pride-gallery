@@ -12,7 +12,10 @@ export function Layout(props: PropsWithChildren<{ title: string; scripts?: strin
       <html lang="en">
         <head>
           <meta charset="utf-8" />
-          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          {/* viewport-fit=cover lets full-bleed backgrounds (and modal
+              backdrops) paint into the iOS safe areas behind the status/address
+              bars instead of being letterboxed below them. */}
+          <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
           <title safe>{props.title}</title>
           <link rel="stylesheet" href="/api/styles.css" />
           {(props.scripts ?? []).map((name) =>

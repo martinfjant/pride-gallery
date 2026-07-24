@@ -45,6 +45,30 @@
   --ok: #2e7d32;
   --fail: #c62828;
   --progress: #007acc;
+
+  /* Let native controls (selects, inputs, scrollbars) follow the theme too. */
+  color-scheme: light dark;
+}
+
+/* Dark mode — respect the visitor's OS preference, no switcher. The gradient
+   hero and brand bar are unchanged; we only re-tone the light surfaces, text,
+   and the few hardcoded neutral placeholders. Most of it rides on the tokens. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #150b1f;            /* near-black, mörklila-tinted */
+    --fg: #ece7f2;
+    --ink: #f4eefb;           /* headings/display text (light) */
+    --muted: #a99fb5;
+    --accent: #c98cff;        /* lighter lila so links/focus read on dark */
+    --border: #372a4a;
+    --panel: #21142f;         /* cards & forms sit just above --bg */
+    --ok: #66bb6a;
+    --fail: #ef5350;
+    --progress: #5aa9e6;
+  }
+  /* Component-level overrides for hardcoded light neutrals live at the END of
+     this file — a media query adds no specificity, so they must come *after*
+     the rules they override in source order to win. */
 }
 * { box-sizing: border-box; }
 body {
@@ -247,7 +271,7 @@ button.primary.is-saving::before {
   isolation: isolate;
   color: #fff;
   text-align: center;
-  padding: clamp(3.5rem, 9vw, 6.5rem) 1.25rem clamp(3rem, 7vw, 5rem);
+  padding: calc(clamp(3.5rem, 9vw, 6.5rem) + env(safe-area-inset-top)) 1.25rem clamp(3rem, 7vw, 5rem);
   background:
     radial-gradient(120% 140% at 82% 4%, rgba(255, 60, 0, 0.55) 0%, rgba(255, 60, 0, 0) 46%),
     linear-gradient(135deg, #270040 0%, #4a0b86 30%, #9d00ff 58%, #c21c86 80%, #ff5a2a 100%);
@@ -268,21 +292,66 @@ button.primary.is-saving::before {
   filter: blur(2px);
 }
 
-/* Wiggly confetti — the parade symbol. Kept at its native angle everywhere
-   (brand rule: always the same direction); only size/position/colour vary. */
+/* Wiggly confetti — the parade symbol raining down the hero. Each piece falls
+   with its own speed/drift/delay; per the brand rule the angle never changes
+   (no rotation — only a gentle horizontal sway), keeping them in unison. The
+   hero's `overflow: hidden` clips them as they leave the bottom edge. */
 .hero .wiggly {
   position: absolute;
+  top: 0;
+  /* Default (small) layer: BEHIND the wordmark (.hero-inner is z-index 2) with
+     a touch of blur, so the little pieces read as the far/background layer. */
   z-index: 1;
   height: auto;
   fill: var(--pop);
   pointer-events: none;
+  filter: blur(0.4px);
+  will-change: transform, opacity;
+  animation: confetti-fall var(--dur, 9s) linear var(--delay, 0s) infinite;
 }
-.hero .w1 { top: 12%; left: 7%; width: 42px; opacity: 0.9; }
-.hero .w2 { top: 20%; right: 12%; width: 30px; fill: var(--pride-lila-ljus); opacity: 0.75; }
-.hero .w3 { bottom: 16%; left: 13%; width: 34px; fill: var(--pride-rod-ljus); opacity: 0.85; }
-.hero .w4 { bottom: 24%; right: 9%; width: 48px; opacity: 0.95; }
-.hero .w5 { top: 48%; left: 3%; width: 22px; fill: #fff; opacity: 0.5; }
-.hero .w6 { bottom: 9%; right: 27%; width: 26px; fill: var(--pride-lila-ljus); opacity: 0.6; }
+/* The larger pieces are the near layer: they fall in FRONT of the wordmark
+   (and already fall faster), with a crisp drop-shadow that both lifts them off
+   the text and stops a green piece melting into the green "2026"/"GALLERY". */
+.hero .w1,
+.hero .w4,
+.hero .w7,
+.hero .w10,
+.hero .w13 {
+  z-index: 3;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
+}
+@keyframes confetti-fall {
+  0%   { transform: translate3d(0, -25vh, 0); opacity: 0; }
+  8%   { opacity: var(--o, 0.9); }
+  50%  { transform: translate3d(var(--drift, 12px), 40vh, 0); }
+  92%  { opacity: var(--o, 0.9); }
+  100% { transform: translate3d(0, 115vh, 0); opacity: 0; }
+}
+.hero .w1 { left: 7%;  width: 42px; --dur: 8s;   --delay: -1s;  --drift: 14px;  --o: 0.9; }
+.hero .w2 { left: 21%; width: 30px; --dur: 11s;  --delay: -6s;  --drift: -12px; --o: 0.75; fill: var(--pride-lila-ljus); }
+.hero .w3 { left: 34%; width: 34px; --dur: 9.5s; --delay: -3s;  --drift: 10px;  --o: 0.85; fill: var(--pride-rod-ljus); }
+.hero .w4 { left: 48%; width: 48px; --dur: 7.5s; --delay: -5s;  --drift: -16px; --o: 0.95; }
+.hero .w5 { left: 61%; width: 22px; --dur: 12s;  --delay: -2s;  --drift: 12px;  --o: 0.5;  fill: #fff; }
+.hero .w6 { left: 73%; width: 26px; --dur: 10s;  --delay: -8s;  --drift: -10px; --o: 0.6;  fill: var(--pride-lila-ljus); }
+.hero .w7 { left: 85%; width: 38px; --dur: 8.5s; --delay: -4s;  --drift: 16px;  --o: 0.85; }
+.hero .w8 { left: 94%; width: 24px; --dur: 11.5s;--delay: -9s;  --drift: -8px;  --o: 0.6;  fill: var(--pride-rod-ljus); }
+.hero .w9 { left: 15%; width: 20px; --dur: 13s;  --delay: -11s; --drift: 10px;  --o: 0.5;  fill: #fff; }
+.hero .w10 { left: 28%; width: 36px; --dur: 8.8s; --delay: -7s;  --drift: -14px; --o: 0.9;  }
+.hero .w11 { left: 42%; width: 22px; --dur: 12.5s;--delay: -2.5s;--drift: 12px;  --o: 0.6;  fill: var(--pride-lila-ljus); }
+.hero .w12 { left: 55%; width: 30px; --dur: 9s;   --delay: -10s; --drift: -10px; --o: 0.8;  fill: var(--pride-rod-ljus); }
+.hero .w13 { left: 67%; width: 40px; --dur: 7.8s; --delay: -5.5s;--drift: 14px;  --o: 0.9;  }
+.hero .w14 { left: 78%; width: 20px; --dur: 13.5s;--delay: -3.5s;--drift: -12px; --o: 0.5;  fill: #fff; }
+.hero .w15 { left: 4%;  width: 28px; --dur: 10.5s;--delay: -12s; --drift: 10px;  --o: 0.7;  fill: var(--pride-lila-ljus); }
+
+/* Respect users who prefer less motion: pin the confetti as a static scatter. */
+@media (prefers-reduced-motion: reduce) {
+  .hero .wiggly { animation: none; opacity: var(--o, 0.8); }
+  .hero .w1 { top: 14%; } .hero .w2 { top: 30%; } .hero .w3 { top: 55%; }
+  .hero .w4 { top: 22%; } .hero .w5 { top: 68%; } .hero .w6 { top: 44%; }
+  .hero .w7 { top: 60%; } .hero .w8 { top: 12%; } .hero .w9 { top: 74%; }
+  .hero .w10 { top: 38%; } .hero .w11 { top: 8%; }  .hero .w12 { top: 50%; }
+  .hero .w13 { top: 70%; } .hero .w14 { top: 26%; } .hero .w15 { top: 58%; }
+}
 
 /* Wordmark + year mark sit side by side as one lockup, the "2026" scaled to
    match the wordmark's height. Wraps to a second line on narrow screens. */
@@ -386,8 +455,9 @@ main.gallery { max-width: 1080px; }
   gap: 0.55rem;
   /* Horizontal padding matches main's `padding: 0 var(--gap)` so the mark's
      left edge lines up with the content below whenever the window is narrower
-     than the content's max-width. */
-  padding: 0.7rem var(--gap);
+     than the content's max-width. The top inset keeps the wordmark clear of the
+     iOS status bar (viewport-fit=cover) while the gradient bleeds behind it. */
+  padding: calc(0.7rem + env(safe-area-inset-top)) var(--gap) 0.7rem;
   background: linear-gradient(135deg, #270040 0%, #4a0b86 30%, #9d00ff 58%, #c21c86 80%, #ff5a2a 100%);
   color: #fff;
   text-decoration: none;
@@ -440,19 +510,19 @@ main h1 { color: var(--ink); }
 .grid a { all: unset; display: block; width: 100%; height: 100%; cursor: pointer; }
 .grid img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.2s; }
 .grid a:hover img { transform: scale(1.03); }
-#lightbox { padding: 0; border: none; background: rgba(0, 0, 0, 0.95); color: white; width: 100vw; height: 100vh; max-width: none; max-height: none; margin: 0; overflow: hidden; }
+#lightbox { padding: 0; border: none; background: rgba(0, 0, 0, 0.95); color: white; width: 100vw; height: 100vh; height: 100dvh; max-width: none; max-height: none; margin: 0; overflow: hidden; }
 #lightbox::backdrop { background: rgba(0, 0, 0, 0.95); }
 .box { position: relative; width: 100%; height: 100%; display: grid; grid-template-rows: 1fr auto; }
 .image-area { position: relative; display: flex; align-items: center; justify-content: center; min-height: 0; overflow: hidden; }
 #lightbox-img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
-.caption { padding: 0.75rem 1rem 1.25rem; text-align: center; font-size: 0.9rem; color: rgba(255,255,255,0.8); }
+.caption { padding: 0.75rem 1rem calc(1.25rem + env(safe-area-inset-bottom)); text-align: center; font-size: 0.9rem; color: rgba(255,255,255,0.8); }
 .caption strong { color: white; font-weight: 600; }
 .nav-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.4); color: white; border: none; width: 3rem; height: 3rem; border-radius: 50%; font-size: 1.75rem; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; }
 .nav-btn:hover { background: rgba(0,0,0,0.7); }
 .nav-btn:disabled { opacity: 0.2; cursor: default; }
 .prev { left: 1rem; }
 .next { right: 1rem; }
-.close { position: absolute; top: 1rem; right: 1rem; background: rgba(0,0,0,0.4); color: white; border: none; width: 2.5rem; height: 2.5rem; border-radius: 50%; font-size: 1.4rem; line-height: 1; cursor: pointer; z-index: 2; }
+.close { position: absolute; top: calc(1rem + env(safe-area-inset-top)); right: calc(1rem + env(safe-area-inset-right)); background: rgba(0,0,0,0.4); color: white; border: none; width: 2.5rem; height: 2.5rem; border-radius: 50%; font-size: 1.4rem; line-height: 1; cursor: pointer; z-index: 2; }
 .close:hover { background: rgba(0,0,0,0.7); }
 
 /* View Transitions API pseudo-elements are document-scoped */
@@ -495,3 +565,16 @@ main h1 { color: var(--ink); }
 .photos .del:hover { border-color: var(--fail); color: var(--fail); background: transparent; }
 .photos .edit:hover { border-color: var(--accent); color: var(--accent); background: transparent; }
 .photos .edit.set { color: var(--accent); border-color: var(--accent); }
+
+/* Dark mode: re-tone the few hardcoded light neutrals. Placed at the end of the
+   file (after the light definitions) so these win in source order — a media
+   query adds no specificity of its own. */
+@media (prefers-color-scheme: dark) {
+  .cover { background: #271937; color: var(--pride-lila-ljus); }
+  .grid li { background: #241933; }
+  .thumb { background: #2a2036; color: #8f84a0; }
+  .focal-frame { background: #2a2036; }
+  button:hover { background: #2c1f3e; }
+  .dropzone.drag { background: #2a1a3a; }
+  .albums a:hover { box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5); }
+}
