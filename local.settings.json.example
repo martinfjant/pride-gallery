@@ -1,0 +1,18 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "AzureWebJobsFeatureFlags": "EnableWorkerIndexing",
+    "PHOTOS_STORAGE_CONNECTION": "UseDevelopmentStorage=true",
+    "ORIGINALS_CONTAINER": "originals",
+    "THUMBNAILS_CONTAINER": "thumbnails",
+    "DISPLAY_CONTAINER": "display",
+    "PHOTOS_TABLE": "photos",
+    "ENABLE_DEBUG_ENDPOINTS": "true",
+    "UPLOAD_PASSWORD": "set-a-local-dev-password-here"
+  },
+  "Host": {
+    "CORS": "*"
+  }
+}

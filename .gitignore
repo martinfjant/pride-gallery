@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+bin/
+obj/
+.python_packages/
+*.js.map
+
+# Logs
+*.log
+npm-debug.log*
+
+# Azure Functions local config (contains UPLOAD_PASSWORD & connection strings)
+local.settings.json
+
+# Azurite local storage emulator state
+.azurite/
+__azurite_db*.json
+__blobstorage__/
+__queuestorage__/
+
+# Local test image drop-folder
+test-uploads/
+
+# Secrets & credentials — never commit these
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+*.p12
+*.publishsettings
+*.credentials
+secrets.json
+appsettings.*.json
+
+# Claude Code local (machine-specific permissions, dev password, resource names)
+.claude/settings.local.json
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store

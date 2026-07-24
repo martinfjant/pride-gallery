@@ -1,0 +1,34 @@
+{
+  "name": "pride-gallery",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Stockholm Pride festival photo gallery",
+  "main": "dist/src/functions/*.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "clean": "rm -rf dist",
+    "prestart": "npm run clean && npm run build",
+    "start": "func start",
+    "upload-test": "node scripts/upload-test.mjs",
+    "test": "echo \"no tests yet\" && exit 0"
+  },
+  "dependencies": {
+    "@azure/data-tables": "^13.2.2",
+    "@azure/functions": "^4.5.1",
+    "@azure/storage-blob": "^12.24.0",
+    "@kitajs/html": "^4.2.13",
+    "sharp": "^0.33.4"
+  },
+  "devDependencies": {
+    "@kitajs/ts-html-plugin": "^4.1.4",
+    "@types/node": "^20.12.7",
+    "typescript": "^5.4.5"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "allowScripts": {
+    "sharp@0.33.5": true
+  }
+}

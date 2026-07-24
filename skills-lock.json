@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "kita-html": {
+      "source": "kitajs/html",
+      "sourceType": "github",
+      "skillPath": "skills/kita-html/SKILL.md",
+      "computedHash": "4cf8973372552915a909bc80d3c01270a3e968adcf1e34556e22c43b712945af"
+    }
+  }
+}
