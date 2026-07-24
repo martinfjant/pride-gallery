@@ -3,6 +3,12 @@ param baseName string
 @secure()
 param uploadPassword string
 
+@description('Email addresses that receive health/cost alerts.')
+param alertEmails array = [
+  'martin.falk.johansson@stockholmpride.org'
+  'martin@falkjohansson.se'
+]
+
 var uniq = uniqueString(resourceGroup().id)
 var storageName = toLower('st${baseName}${take(uniq, 12)}')
 var functionAppName = 'func-${baseName}-${take(uniq, 8)}'
@@ -256,6 +262,76 @@ resource appRoute 'Microsoft.Cdn/profiles/afdEndpoints/routes@2024-02-01' = {
     linkToDefaultDomain: 'Enabled'
   }
   dependsOn: [ appOrigin ]
+}
+
+// --- Monitoring: ops action group + health alerts (#16) ---
+// NOTE: the monthly cost budget (#17) is created idempotently in deploy.sh, not here,
+// because a budget startDate must be a valid recent first-of-month (a hardcoded date
+// would eventually be rejected on future deploys).
+resource opsActionGroup 'Microsoft.Insights/actionGroups@2023-01-01' = {
+  name: 'ag-${baseName}-ops'
+  location: 'global'
+  properties: {
+    groupShortName: 'pridegalops'
+    enabled: true
+    emailReceivers: [for (email, i) in alertEmails: {
+      name: 'ops${i}'
+      emailAddress: email
+      useCommonAlertSchema: true
+    }]
+  }
+}
+
+resource exceptionsAlert 'Microsoft.Insights/metricAlerts@2018-03-01' = {
+  name: 'alert-${baseName}-exceptions'
+  location: 'global'
+  properties: {
+    description: 'Any server-side exception in the Pride Gallery app (5-min window)'
+    severity: 2
+    enabled: true
+    scopes: [ appInsights.id ]
+    evaluationFrequency: 'PT5M'
+    windowSize: 'PT5M'
+    criteria: {
+      'odata.type': 'Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria'
+      allOf: [ {
+        name: 'exceptions'
+        metricNamespace: 'microsoft.insights/components'
+        metricName: 'exceptions/server'
+        operator: 'GreaterThan'
+        threshold: 0
+        timeAggregation: 'Count'
+        criterionType: 'StaticThresholdCriterion'
+      } ]
+    }
+    actions: [ { actionGroupId: opsActionGroup.id } ]
+  }
+}
+
+resource failedRequestsAlert 'Microsoft.Insights/metricAlerts@2018-03-01' = {
+  name: 'alert-${baseName}-failed-requests'
+  location: 'global'
+  properties: {
+    description: 'One or more failed HTTP requests (5xx/exceptions) in a 15-min window'
+    severity: 3
+    enabled: true
+    scopes: [ appInsights.id ]
+    evaluationFrequency: 'PT5M'
+    windowSize: 'PT15M'
+    criteria: {
+      'odata.type': 'Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria'
+      allOf: [ {
+        name: 'failedRequests'
+        metricNamespace: 'microsoft.insights/components'
+        metricName: 'requests/failed'
+        operator: 'GreaterThan'
+        threshold: 0
+        timeAggregation: 'Count'
+        criterionType: 'StaticThresholdCriterion'
+      } ]
+    }
+    actions: [ { actionGroupId: opsActionGroup.id } ]
+  }
 }
 
 output functionAppName string = functionApp.name

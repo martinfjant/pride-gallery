@@ -197,6 +197,25 @@ else
   echo "    Dead-letter sink: skipped (Event Grid lacks write access to storage; non-fatal)"
 fi
 
+# Monthly cost budget (#17). Kept out of Bicep because a budget's startDate must be
+# a valid recent first-of-month; computing it here keeps redeploys from being rejected
+# by a stale hardcoded date. Idempotent PUT — safe to re-run.
+: "${BUDGET_AMOUNT:=200}"
+: "${ALERT_EMAILS:=martin.falk.johansson@stockholmpride.org martin@falkjohansson.se}"
+echo "==> Ensuring monthly cost budget (${BUDGET_AMOUNT}/mo)"
+SUB_ID=$(az account show --query id -o tsv)
+BUDGET_START="$(date -u +%Y-%m-01)T00:00:00Z"
+# Build the contactEmails JSON array from the space-separated ALERT_EMAILS.
+EMAILS_JSON=$(printf '%s\n' $ALERT_EMAILS | awk 'BEGIN{s=""}{printf "%s\"%s\"", s, $0; s=","}')
+if az rest --method put \
+      --url "https://management.azure.com/subscriptions/${SUB_ID}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Consumption/budgets/budget-${BASE_NAME}-monthly?api-version=2023-11-01" \
+      --body "{\"properties\":{\"category\":\"Cost\",\"amount\":${BUDGET_AMOUNT},\"timeGrain\":\"Monthly\",\"timePeriod\":{\"startDate\":\"${BUDGET_START}\",\"endDate\":\"2030-07-01T00:00:00Z\"},\"notifications\":{\"actual_80\":{\"enabled\":true,\"operator\":\"GreaterThanOrEqualTo\",\"threshold\":80,\"thresholdType\":\"Actual\",\"contactEmails\":[${EMAILS_JSON}]},\"actual_100\":{\"enabled\":true,\"operator\":\"GreaterThanOrEqualTo\",\"threshold\":100,\"thresholdType\":\"Actual\",\"contactEmails\":[${EMAILS_JSON}]},\"forecast_100\":{\"enabled\":true,\"operator\":\"GreaterThanOrEqualTo\",\"threshold\":100,\"thresholdType\":\"Forecasted\",\"contactEmails\":[${EMAILS_JSON}]}}}}" \
+      --output none 2>/dev/null; then
+  echo "    Budget: budget-${BASE_NAME}-monthly (start ${BUDGET_START%%T*})"
+else
+  echo "    Budget: skipped (no Microsoft.Consumption write access; non-fatal)"
+fi
+
 echo
 echo "Deployed. Front Door can take 5-10 min to finish propagating on first deploy."
 echo "Once propagated, the site (pages + images) is served entirely through Front Door:"
