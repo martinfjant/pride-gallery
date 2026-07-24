@@ -57,6 +57,18 @@ export function IndexPage({ albums }: { albums: AlbumSummary[] }): JSX.Element {
   const totalPhotos = albums.reduce((sum, a) => sum + a.count, 0);
   return (
     <Layout title="Stockholm Pride Gallery">
+      {/* Squircle (superellipse) corners for the album cards — a static SVG
+          clipPath in normalized objectBoundingBox units, referenced from CSS
+          (`.albums a { clip-path: url(#album-squircle) }`). No JS, no flash, and
+          identical in every browser. Radius scales with the card box, which is
+          fine because the cards are near-square. */}
+      <svg class="svg-defs" width="0" height="0" aria-hidden="true" focusable="false">
+        <defs>
+          <clipPath id="album-squircle" clipPathUnits="objectBoundingBox">
+            <path d="M0.0900,0L0.9100,0L0.9100,0.0000L0.9382,0.0002L0.9498,0.0009L0.9585,0.0020L0.9657,0.0035L0.9718,0.0055L0.9771,0.0079L0.9817,0.0109L0.9857,0.0143L0.9891,0.0183L0.9921,0.0229L0.9945,0.0282L0.9965,0.0343L0.9980,0.0415L0.9991,0.0502L0.9998,0.0618L1.0000,0.0900L1,0.9100L1.0000,0.9100L0.9998,0.9382L0.9991,0.9498L0.9980,0.9585L0.9965,0.9657L0.9945,0.9718L0.9921,0.9771L0.9891,0.9817L0.9857,0.9857L0.9817,0.9891L0.9771,0.9921L0.9718,0.9945L0.9657,0.9965L0.9585,0.9980L0.9498,0.9991L0.9382,0.9998L0.9100,1.0000L0.0900,1L0.0900,1.0000L0.0618,0.9998L0.0502,0.9991L0.0415,0.9980L0.0343,0.9965L0.0282,0.9945L0.0229,0.9921L0.0183,0.9891L0.0143,0.9857L0.0109,0.9817L0.0079,0.9771L0.0055,0.9718L0.0035,0.9657L0.0020,0.9585L0.0009,0.9498L0.0002,0.9382L0.0000,0.9100L0,0.0900L0.0000,0.0900L0.0002,0.0618L0.0009,0.0502L0.0020,0.0415L0.0035,0.0343L0.0055,0.0282L0.0079,0.0229L0.0109,0.0183L0.0143,0.0143L0.0183,0.0109L0.0229,0.0079L0.0282,0.0055L0.0343,0.0035L0.0415,0.0020L0.0502,0.0009L0.0618,0.0002L0.0900,0.0000Z" />
+          </clipPath>
+        </defs>
+      </svg>
       <header class="hero">
         <Star cls="starburst" />
         <Wiggly cls="w1" />
@@ -109,26 +121,33 @@ export function IndexPage({ albums }: { albums: AlbumSummary[] }): JSX.Element {
             <ul class="albums">
               {albums.map((album) => (
                 <li>
+                  {/* Two nested squircle-clipped layers: the <a> is the 1px
+                      border ring (border colour + padding), .card-inner is the
+                      panel fill. The gap between the two clips is the border,
+                      which follows the squircle — a plain border would be cut
+                      off at the corners by the clip-path. */}
                   <a href={`/${encodeURIComponent(album.slug)}`}>
-                    <div class="cover">
-                      {album.coverRowKey ? (
-                        <picture>
-                          <source
-                            srcset={imageUrl('thumbnails', album.slug, album.coverRowKey, 'webp')}
-                            type="image/webp"
-                          />
-                          <img src={imageUrl('thumbnails', album.slug, album.coverRowKey, 'jpg')} alt="" loading="lazy" />
-                        </picture>
-                      ) : (
-                        'No photos yet'
-                      )}
-                    </div>
-                    <div class="meta">
-                      <h2 safe>{album.name}</h2>
-                      <p class="desc" safe>{album.description}</p>
-                      <p class="count">
-                        {album.count} photo{album.count === 1 ? '' : 's'}
-                      </p>
+                    <div class="card-inner">
+                      <div class="cover">
+                        {album.coverRowKey ? (
+                          <picture>
+                            <source
+                              srcset={imageUrl('thumbnails', album.slug, album.coverRowKey, 'webp')}
+                              type="image/webp"
+                            />
+                            <img src={imageUrl('thumbnails', album.slug, album.coverRowKey, 'jpg')} alt="" loading="lazy" />
+                          </picture>
+                        ) : (
+                          'No photos yet'
+                        )}
+                      </div>
+                      <div class="meta">
+                        <h2 safe>{album.name}</h2>
+                        <p class="desc" safe>{album.description}</p>
+                        <p class="count">
+                          {album.count} photo{album.count === 1 ? '' : 's'}
+                        </p>
+                      </div>
                     </div>
                   </a>
                 </li>

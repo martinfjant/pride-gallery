@@ -264,6 +264,41 @@ resource appRoute 'Microsoft.Cdn/profiles/afdEndpoints/routes@2024-02-01' = {
   dependsOn: [ appOrigin ]
 }
 
+// Static app assets (CSS + JS bundles) served by the Function app at content-
+// hashed URLs like /api/app.<hash>.js. This route is more specific than the
+// '/*' app route, so Front Door matches it first for these paths. Caching is
+// enabled here — and only here on the app origin — because Front Door
+// compression (gzip/brotli, chosen per request via Accept-Encoding) only
+// applies to cacheable routes. The URLs embed a content hash, so caching them
+// immutably never serves a stale mix: a changed file ships under a new URL.
+// The dynamic gallery HTML and the /api/* JSON endpoints stay on the uncached
+// '/*' route. Fonts (/api/fonts/*.woff2) are excluded — woff2 is already
+// compressed.
+resource appAssetsRoute 'Microsoft.Cdn/profiles/afdEndpoints/routes@2024-02-01' = {
+  parent: frontDoorEndpoint
+  name: 'app-assets'
+  properties: {
+    originGroup: { id: appOriginGroup.id }
+    patternsToMatch: [ '/api/*.css', '/api/*.js' ]
+    supportedProtocols: [ 'Https' ]
+    forwardingProtocol: 'HttpsOnly'
+    httpsRedirect: 'Enabled'
+    linkToDefaultDomain: 'Enabled'
+    cacheConfiguration: {
+      queryStringCachingBehavior: 'IgnoreQueryString'
+      compressionSettings: {
+        isCompressionEnabled: true
+        contentTypesToCompress: [
+          'text/css'
+          'text/javascript'
+          'application/javascript'
+        ]
+      }
+    }
+  }
+  dependsOn: [ appOrigin ]
+}
+
 // --- Monitoring: ops action group + health alerts (#16) ---
 // NOTE: the monthly cost budget (#17) is created idempotently in deploy.sh, not here,
 // because a budget startDate must be a valid recent first-of-month (a hardcoded date

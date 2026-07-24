@@ -1,6 +1,7 @@
 import { Layout } from './layout';
 import { BrandBar } from './brand';
 import { imageUrl } from '../shared/imageUrl';
+import { assetUrl } from '../shared/assets';
 
 export type AlbumInfo = { slug: string; name: string; description: string };
 export type AlbumPhoto = { rowKey: string; photographer?: string };
@@ -63,7 +64,7 @@ export function AlbumPage({ album, photos }: { album: AlbumInfo | null; photos: 
           <div class="caption" id="caption"></div>
         </div>
       </dialog>
-      <script type="module" src="/api/album.js"></script>
+      <script type="module" src={assetUrl('album.js')}></script>
     </Layout>
   );
 }

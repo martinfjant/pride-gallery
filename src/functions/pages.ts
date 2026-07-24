@@ -8,6 +8,7 @@ import { ManagePage } from '../pages/manage';
 import { ManageAlbumPanel } from '../pages/managePanel';
 import { listAlbumsData } from '../shared/albums';
 import { listPhotosData } from '../shared/photos';
+import { ASSETS, Asset } from '../shared/assets';
 
 function serveHtml(element: JSX.Element): HttpResponseInit {
   return {
@@ -20,22 +21,18 @@ function serveHtml(element: JSX.Element): HttpResponseInit {
   };
 }
 
-const rawCache = new Map<string, string>();
-
-async function serveStaticAsset(filename: string, contentType: string, templated: boolean): Promise<HttpResponseInit> {
-  let raw = rawCache.get(filename);
-  if (raw === undefined) {
-    raw = await readFile(join(process.cwd(), 'public', filename), 'utf-8');
-    rawCache.set(filename, raw);
-  }
-  const body = templated ? raw.replace(/__IMAGE_BASE__/g, process.env.PUBLIC_IMAGE_BASE ?? '/api/image') : raw;
+function serveAsset(asset: Asset): HttpResponseInit {
   return {
     status: 200,
     headers: {
-      'content-type': contentType,
-      'cache-control': 'public, max-age=300',
+      'content-type': asset.contentType,
+      // The URL embeds a content hash (see shared/assets.ts), so a changed file
+      // always ships under a new URL. That makes it safe to cache forever and
+      // lets Front Door serve these gzip/brotli-compressed — compression on
+      // Front Door only applies to cacheable routes.
+      'cache-control': 'public, max-age=31536000, immutable',
     },
-    body,
+    body: asset.body,
   };
 }
 
@@ -147,12 +144,16 @@ app.http('manageAlbumPanel', {
   handler: manageAlbumPanelHandler,
 });
 
-app.http('styles', {
-  methods: ['GET'],
-  authLevel: 'anonymous',
-  route: 'api/styles.css',
-  handler: () => serveStaticAsset('styles.css', 'text/css; charset=utf-8', false),
-});
+// Register a route per content-hashed asset (styles.css + JS bundles). The
+// hashed path and body both come from the manifest built at cold start.
+for (const [key, asset] of ASSETS) {
+  app.http(`asset_${key.replace(/[^a-zA-Z0-9]/g, '_')}`, {
+    methods: ['GET'],
+    authLevel: 'anonymous',
+    route: asset.route,
+    handler: () => serveAsset(asset),
+  });
+}
 
 app.http('fontBricolageLatin', {
   methods: ['GET'],
@@ -168,37 +169,3 @@ app.http('fontBricolageLatinExt', {
   handler: () => serveStaticBinary('fonts/bricolage-grotesque-latin-ext.woff2', 'font/woff2'),
 });
 
-app.http('albumScript', {
-  methods: ['GET'],
-  authLevel: 'anonymous',
-  route: 'api/album.js',
-  handler: () => serveStaticAsset('album.js', 'text/javascript; charset=utf-8', false),
-});
-
-app.http('uploadScript', {
-  methods: ['GET'],
-  authLevel: 'anonymous',
-  route: 'api/upload.js',
-  handler: () => serveStaticAsset('upload.js', 'text/javascript; charset=utf-8', false),
-});
-
-app.http('htmxScript', {
-  methods: ['GET'],
-  authLevel: 'anonymous',
-  route: 'api/htmx.js',
-  handler: () => serveStaticAsset('htmx.min.js', 'text/javascript; charset=utf-8', false),
-});
-
-app.http('appScript', {
-  methods: ['GET'],
-  authLevel: 'anonymous',
-  route: 'api/app.js',
-  handler: () => serveStaticAsset('app.js', 'text/javascript; charset=utf-8', false),
-});
-
-app.http('editScript', {
-  methods: ['GET'],
-  authLevel: 'anonymous',
-  route: 'api/edit.js',
-  handler: () => serveStaticAsset('edit.js', 'text/javascript; charset=utf-8', false),
-});

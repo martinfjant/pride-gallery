@@ -2,6 +2,7 @@ import { CrossLink, Layout } from './layout';
 import { BrandBar } from './brand';
 import { EditModal } from './editModal';
 import type { AlbumSummary } from '../shared/albums';
+import { assetUrl } from '../shared/assets';
 
 export function UploadPage({ albums, selectedSlug }: { albums: AlbumSummary[]; selectedSlug?: string }): JSX.Element {
   const hasSelection = !!selectedSlug && albums.some((a) => a.slug === selectedSlug);
@@ -85,7 +86,7 @@ export function UploadPage({ albums, selectedSlug }: { albums: AlbumSummary[]; s
         </div>
       </main>
       <EditModal />
-      <script type="module" src="/api/upload.js"></script>
+      <script type="module" src={assetUrl('upload.js')}></script>
     </Layout>
   );
 }

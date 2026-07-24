@@ -1,4 +1,5 @@
 import type { PropsWithChildren } from '@kitajs/html';
+import { assetUrl } from '../shared/assets';
 
 /**
  * Shared HTML shell. `scripts` names shared libraries to load (deferred, in
@@ -17,14 +18,14 @@ export function Layout(props: PropsWithChildren<{ title: string; scripts?: strin
               bars instead of being letterboxed below them. */}
           <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
           <title safe>{props.title}</title>
-          <link rel="stylesheet" href="/api/styles.css" />
+          <link rel="stylesheet" href={assetUrl('styles.css')} />
           {(props.scripts ?? []).map((name) =>
             // htmx is a classic UMD global; our own scripts are ES modules so
             // their top-level bindings don't collide in the shared global scope.
             name === 'htmx' ? (
-              <script defer src="/api/htmx.js"></script>
+              <script defer src={assetUrl('htmx.js')}></script>
             ) : (
-              <script type="module" src={`/api/${name}.js`}></script>
+              <script type="module" src={assetUrl(`${name}.js`)}></script>
             ),
           )}
         </head>
