@@ -18,6 +18,20 @@ export function Layout(props: PropsWithChildren<{ title: string; scripts?: strin
               bars instead of being letterboxed below them. */}
           <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
           <title safe>{props.title}</title>
+          {/* Preload the primary (Latin) display font. Without this the browser
+              only discovers it after fetching + parsing styles.css, forming a
+              3-deep critical chain (HTML -> CSS -> font). Preloading fetches it
+              in parallel with the CSS. `crossorigin` is required even same-origin
+              — fonts are always fetched in anonymous CORS mode, and the preload
+              must match or it double-fetches. The Latin subset covers Swedish
+              å/ä/ö; the -ext subset is loaded lazily only if its glyphs appear. */}
+          <link
+            rel="preload"
+            href="/api/fonts/bricolage-grotesque-latin.woff2"
+            as="font"
+            type="font/woff2"
+            crossorigin="anonymous"
+          />
           <link rel="stylesheet" href={assetUrl('styles.css')} />
           {(props.scripts ?? []).map((name) =>
             // htmx is a classic UMD global; our own scripts are ES modules so
@@ -28,6 +42,10 @@ export function Layout(props: PropsWithChildren<{ title: string; scripts?: strin
               <script type="module" src={assetUrl(`${name}.js`)}></script>
             ),
           )}
+          {/* GoatCounter privacy-friendly pageview analytics. Loaded async from
+              the vendor CDN; sends a hit to the stockholmpride.goatcounter.com
+              endpoint. On every page via the shared Layout. */}
+          <script data-goatcounter="https://stockholmpride.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
         </head>
         <body>{props.children}</body>
       </html>
