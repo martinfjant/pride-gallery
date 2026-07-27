@@ -54,8 +54,8 @@ async function preload(url) {
 function updateCaption(thumb) {
   captionEl.innerHTML = '';
   const cred = document.createElement('span');
-  cred.innerHTML = `Photo by <strong></strong>`;
-  cred.querySelector('strong').textContent = thumb.dataset.photographer || 'unknown';
+  cred.innerHTML = `Foto av <strong></strong>`;
+  cred.querySelector('strong').textContent = thumb.dataset.photographer || 'okänd';
   captionEl.appendChild(cred);
   const counter = document.createElement('span');
   counter.textContent = ` · ${currentIndex + 1} / ${thumbs.length}`;

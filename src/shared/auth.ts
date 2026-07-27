@@ -4,7 +4,7 @@ import { timingSafeEqual } from 'node:crypto';
 export function checkUploadAuth(request: HttpRequest): HttpResponseInit | null {
   const expected = process.env.UPLOAD_PASSWORD;
   if (!expected) {
-    return { status: 500, jsonBody: { error: 'server misconfigured: UPLOAD_PASSWORD not set' } };
+    return { status: 500, jsonBody: { error: 'servern är felkonfigurerad: UPLOAD_PASSWORD är inte satt' } };
   }
 
   const header = request.headers.get('authorization') ?? '';
@@ -14,7 +14,7 @@ export function checkUploadAuth(request: HttpRequest): HttpResponseInit | null {
     return {
       status: 401,
       headers: { 'WWW-Authenticate': 'Bearer' },
-      jsonBody: { error: 'missing bearer token' },
+      jsonBody: { error: 'bearer-token saknas' },
     };
   }
 
@@ -24,7 +24,7 @@ export function checkUploadAuth(request: HttpRequest): HttpResponseInit | null {
     return {
       status: 401,
       headers: { 'WWW-Authenticate': 'Bearer' },
-      jsonBody: { error: 'invalid token' },
+      jsonBody: { error: 'ogiltig token' },
     };
   }
 

@@ -10,7 +10,7 @@
  */
 export function BrandBar(): JSX.Element {
   return (
-    <a class="brandbar" href="/" title="Back to all albums" aria-label="Stockholm Pride Gallery — all albums">
+    <a class="brandbar" href="/" title="Tillbaka till alla album" aria-label="Stockholm Pride Gallery — alla album">
       <svg class="bb-mark" viewBox="0 0 172.8 178.04" aria-hidden="true">
         <path
           fill="#00fb75"

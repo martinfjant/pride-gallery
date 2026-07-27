@@ -11,7 +11,7 @@ async function deletePhotoHandler(request: HttpRequest, context: InvocationConte
   const album = request.params.album;
   const photoId = request.params.photoId;
   if (!album || !photoId) {
-    return { status: 400, jsonBody: { error: 'missing album or photoId' } };
+    return { status: 400, jsonBody: { error: 'album eller photoId saknas' } };
   }
 
   const table = await getPhotosTable();

@@ -23,7 +23,7 @@ async function uploadHandler(request: HttpRequest, context: InvocationContext): 
 
   const contentType = request.headers.get('content-type') ?? '';
   if (!contentType.startsWith('multipart/form-data')) {
-    return { status: 415, jsonBody: { error: 'expected multipart/form-data' } };
+    return { status: 415, jsonBody: { error: 'förväntade multipart/form-data' } };
   }
 
   const form = await request.formData();
@@ -32,18 +32,18 @@ async function uploadHandler(request: HttpRequest, context: InvocationContext): 
   const file = form.get('file');
 
   if (typeof rawAlbum !== 'string' || !rawAlbum.trim()) {
-    return { status: 400, jsonBody: { error: 'missing album' } };
+    return { status: 400, jsonBody: { error: 'album saknas' } };
   }
   if (!(file instanceof File)) {
-    return { status: 400, jsonBody: { error: 'missing file' } };
+    return { status: 400, jsonBody: { error: 'fil saknas' } };
   }
   if (!ALLOWED_TYPES.has(file.type)) {
-    return { status: 415, jsonBody: { error: `unsupported content type: ${file.type}` } };
+    return { status: 415, jsonBody: { error: `innehållstypen stöds inte: ${file.type}` } };
   }
 
   const album = rawAlbum.trim();
   if (!(await albumExists(album))) {
-    return { status: 400, jsonBody: { error: `album "${album}" does not exist; create it first via POST /api/albums` } };
+    return { status: 400, jsonBody: { error: `albumet "${album}" finns inte; skapa det först via POST /api/albums` } };
   }
   const photographer = typeof rawPhotographer === 'string' ? rawPhotographer.trim().slice(0, 120) : '';
 

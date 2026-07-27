@@ -11,7 +11,7 @@ async function deleteAlbumHandler(request: HttpRequest, context: InvocationConte
 
   const slug = request.params.slug;
   if (!slug) {
-    return { status: 400, jsonBody: { error: 'missing slug' } };
+    return { status: 400, jsonBody: { error: 'slug saknas' } };
   }
 
   const albumsTable = await getAlbumsTable();
@@ -19,7 +19,7 @@ async function deleteAlbumHandler(request: HttpRequest, context: InvocationConte
     await albumsTable.getEntity(ALBUM_PARTITION, slug);
   } catch (err) {
     if (err instanceof RestError && err.statusCode === 404) {
-      return { status: 404, jsonBody: { error: `album "${slug}" not found` } };
+      return { status: 404, jsonBody: { error: `albumet "${slug}" hittades inte` } };
     }
     throw err;
   }

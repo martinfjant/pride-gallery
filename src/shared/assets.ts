@@ -33,6 +33,11 @@ const DEFS: AssetDef[] = [
   { key: 'edit.js', file: 'edit.js', contentType: 'text/javascript; charset=utf-8' },
   { key: 'album.js', file: 'album.js', contentType: 'text/javascript; charset=utf-8' },
   { key: 'upload.js', file: 'upload.js', contentType: 'text/javascript; charset=utf-8' },
+  // Footer wordmark logos: black-text for light theme, white-text for dark. The
+  // footer's <picture> element picks between them by prefers-color-scheme, so
+  // only the matching one is fetched.
+  { key: 'logo-light.svg', file: 'svg/Logga, färg, svart text, Stockholm Pride.svg', contentType: 'image/svg+xml; charset=utf-8' },
+  { key: 'logo-dark.svg', file: 'svg/Logga, färg, vit text, Stockholm Pride.svg', contentType: 'image/svg+xml; charset=utf-8' },
 ];
 
 export interface Asset {

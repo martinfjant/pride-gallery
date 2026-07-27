@@ -13,19 +13,19 @@ async function updateAlbumHandler(request: HttpRequest, _context: InvocationCont
 
   const slug = request.params.slug;
   if (!slug) {
-    return { status: 400, jsonBody: { error: 'missing slug' } };
+    return { status: 400, jsonBody: { error: 'slug saknas' } };
   }
 
   let body: Record<string, unknown>;
   try {
     body = await readBody(request);
   } catch {
-    return { status: 400, jsonBody: { error: 'expected JSON or form body' } };
+    return { status: 400, jsonBody: { error: 'förväntade JSON- eller formulärdata' } };
   }
 
   const { name, description } = body;
   if (name === undefined && description === undefined) {
-    return { status: 400, jsonBody: { error: 'expected name and/or description' } };
+    return { status: 400, jsonBody: { error: 'förväntade namn och/eller beskrivning' } };
   }
 
   const update: { partitionKey: string; rowKey: string } & Partial<AlbumEntity> = {
@@ -34,13 +34,13 @@ async function updateAlbumHandler(request: HttpRequest, _context: InvocationCont
   };
   if (name !== undefined) {
     if (typeof name !== 'string' || !name.trim() || name.length > NAME_MAX) {
-      return { status: 400, jsonBody: { error: `name must be a non-empty string, max ${NAME_MAX} chars` } };
+      return { status: 400, jsonBody: { error: `namn måste vara en icke-tom text, högst ${NAME_MAX} tecken` } };
     }
     update.name = name.trim();
   }
   if (description !== undefined) {
     if (typeof description !== 'string' || !description.trim() || description.length > DESCRIPTION_MAX) {
-      return { status: 400, jsonBody: { error: `description must be a non-empty string, max ${DESCRIPTION_MAX} chars` } };
+      return { status: 400, jsonBody: { error: `beskrivning måste vara en icke-tom text, högst ${DESCRIPTION_MAX} tecken` } };
     }
     update.description = description.trim();
   }
@@ -50,7 +50,7 @@ async function updateAlbumHandler(request: HttpRequest, _context: InvocationCont
     await table.updateEntity(update, 'Merge');
   } catch (err) {
     if (err instanceof RestError && err.statusCode === 404) {
-      return { status: 404, jsonBody: { error: `album "${slug}" not found` } };
+      return { status: 404, jsonBody: { error: `albumet "${slug}" hittades inte` } };
     }
     throw err;
   }

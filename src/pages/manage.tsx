@@ -5,15 +5,15 @@ import type { AlbumSummary } from '../shared/albums';
 
 export function ManagePage({ albums }: { albums: AlbumSummary[] }): JSX.Element {
   return (
-    <Layout title="Manage albums — Stockholm Pride Gallery" scripts={['htmx', 'app', 'edit']}>
+    <Layout title="Hantera album — Stockholm Pride Gallery" scripts={['htmx', 'app', 'edit']}>
       <BrandBar />
       <main>
         <h1>
-          Manage albums <CrossLink href="/api/upload-page" label="Upload photos →" />
+          Hantera album <CrossLink href="/api/upload-page" label="Ladda upp foton →" />
         </h1>
         <form class="settings" id="settings" autocomplete="off">
           <label>
-            Password
+            Lösenord
             <input type="password" name="password" required autocomplete="current-password" />
           </label>
         </form>
@@ -23,7 +23,7 @@ export function ManagePage({ albums }: { albums: AlbumSummary[] }): JSX.Element 
           <label>
             Album
             <select name="album" required hx-get="/api/manage/album" hx-target="#album-panel" hx-swap="innerHTML">
-              <option value="" disabled selected>Choose an album…</option>
+              <option value="" disabled selected>Välj ett album…</option>
               {albums.map((album) => (
                 <option value={album.slug} safe>{`${album.name} (${album.slug})`}</option>
               ))}

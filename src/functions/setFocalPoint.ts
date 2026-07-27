@@ -6,14 +6,14 @@ import { processOriginalImage } from '../shared/processImage';
 
 function parseFocal(body: unknown): { focal: Focal | null } | { error: string } {
   if (body === null) return { focal: null };
-  if (!body || typeof body !== 'object') return { error: 'expected JSON object or null' };
+  if (!body || typeof body !== 'object') return { error: 'förväntade JSON-objekt eller null' };
   const { x, y } = body as Record<string, unknown>;
   if (x === null && y === null) return { focal: null };
   if (typeof x !== 'number' || typeof y !== 'number' || Number.isNaN(x) || Number.isNaN(y)) {
-    return { error: 'x and y must be numbers (or both null to clear)' };
+    return { error: 'x och y måste vara tal (eller båda null för att rensa)' };
   }
   if (x < 0 || x > 1 || y < 0 || y > 1) {
-    return { error: 'x and y must be in [0, 1]' };
+    return { error: 'x och y måste ligga i [0, 1]' };
   }
   return { focal: { x, y } };
 }
@@ -25,14 +25,14 @@ async function setFocalPointHandler(request: HttpRequest, context: InvocationCon
   const album = request.params.album;
   const photoId = request.params.photoId;
   if (!album || !photoId) {
-    return { status: 400, jsonBody: { error: 'missing album or photoId' } };
+    return { status: 400, jsonBody: { error: 'album eller photoId saknas' } };
   }
 
   let body: unknown;
   try {
     body = await request.json();
   } catch {
-    return { status: 400, jsonBody: { error: 'expected JSON body' } };
+    return { status: 400, jsonBody: { error: 'förväntade JSON-data' } };
   }
 
   const parsed = parseFocal(body);
@@ -44,7 +44,7 @@ async function setFocalPointHandler(request: HttpRequest, context: InvocationCon
     entity = await table.getEntity<PhotoEntity>(album, photoId);
   } catch (err) {
     if (err instanceof RestError && err.statusCode === 404) {
-      return { status: 404, jsonBody: { error: `photo not found: ${album}/${photoId}` } };
+      return { status: 404, jsonBody: { error: `fotot hittades inte: ${album}/${photoId}` } };
     }
     throw err;
   }

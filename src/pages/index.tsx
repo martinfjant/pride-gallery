@@ -96,10 +96,7 @@ export function IndexPage({ albums }: { albums: AlbumSummary[] }): JSX.Element {
             </h1>
             <YearMark />
           </div>
-          <p class="hero-sub">Photos from the festival — browse the albums and relive the weekend.</p>
-          <a class="hero-cta" href="/api/upload-page">
-            Upload photos <span aria-hidden="true">→</span>
-          </a>
+          <p class="hero-sub">Foton från festivalen — bläddra bland albumen och återupplev helgen.</p>
         </div>
       </header>
       <main class="gallery">
@@ -107,16 +104,15 @@ export function IndexPage({ albums }: { albums: AlbumSummary[] }): JSX.Element {
           <div class="empty">
             <Star cls="starburst-sm" />
             <p>
-              No albums yet. <a href="/api/upload-page">Upload the first photos</a> to get started.
+              Inga album ännu. <a href="/api/upload-page">Ladda upp de första fotona</a> för att komma igång.
             </p>
           </div>
         ) : (
           <>
             <div class="section-head">
-              <h2>Albums</h2>
+              <h2>Album</h2>
               <span class="section-count">
-                {totalPhotos} photo{totalPhotos === 1 ? '' : 's'} across {albums.length} album
-                {albums.length === 1 ? '' : 's'}
+                {totalPhotos} foto{totalPhotos === 1 ? '' : 'n'} i {albums.length} album
               </span>
             </div>
             <ul class="albums">
@@ -155,14 +151,14 @@ export function IndexPage({ albums }: { albums: AlbumSummary[] }): JSX.Element {
                             />
                           </picture>
                         ) : (
-                          'No photos yet'
+                          'Inga foton ännu'
                         )}
                       </div>
                       <div class="meta">
                         <h2 safe>{album.name}</h2>
                         <p class="desc" safe>{album.description}</p>
                         <p class="count">
-                          {album.count} photo{album.count === 1 ? '' : 's'}
+                          {album.count} foto{album.count === 1 ? '' : 'n'}
                         </p>
                       </div>
                     </div>

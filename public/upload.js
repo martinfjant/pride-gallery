@@ -81,9 +81,9 @@ let failed = 0;
 function updateSummary() {
   const total = queue.children.length;
   const active = total - uploaded - failed;
-  const parts = [`${uploaded} uploaded`];
-  if (failed) parts.push(`${failed} failed`);
-  if (active) parts.push(`${active} in progress`);
+  const parts = [`${uploaded} uppladdade`];
+  if (failed) parts.push(`${failed} misslyckades`);
+  if (active) parts.push(`${active} pågår`);
   summary.textContent = parts.join(', ');
   toolbar.hidden = total === 0;
 }
@@ -139,15 +139,15 @@ async function uploadFile(file) {
   metaEl.className = 'photo-meta';
   const renderMeta = () => {
     metaEl.textContent = needsName(photographer)
-      ? `Photo by ${NO_NAME} — click ✎ to name`
-      : `Photo by ${photographer}`;
+      ? `Foto av ${NO_NAME} — klicka på ✎ för att namnge`
+      : `Foto av ${photographer}`;
     li.classList.toggle('needs-name', needsName(photographer));
   };
   renderMeta();
   info.append(nameEl, metaEl);
   const statusEl = document.createElement('div');
   statusEl.className = 'status uploading';
-  statusEl.textContent = 'uploading…';
+  statusEl.textContent = 'laddar upp…';
   li.append(thumbEl, info, statusEl);
   queue.appendChild(li);
   updateSummary();
@@ -176,7 +176,7 @@ async function uploadFile(file) {
     }
     const json = await res.json();
     statusEl.className = 'status ok';
-    statusEl.textContent = 'uploaded';
+    statusEl.textContent = 'uppladdad';
     uploaded++;
     updateSummary();
     tryLoadThumbnail(thumbEl, json.album, json.photoId);
@@ -185,9 +185,9 @@ async function uploadFile(file) {
     delBtn.className = 'del';
     delBtn.type = 'button';
     delBtn.textContent = '×';
-    delBtn.title = 'Delete photo';
+    delBtn.title = 'Ta bort foto';
     delBtn.addEventListener('click', async () => {
-      if (!confirm(`Delete ${file.name}? This removes the original, thumbnail, and display copies.`)) return;
+      if (!confirm(`Ta bort ${file.name}? Detta tar bort originalet, miniatyren och visningskopiorna.`)) return;
       delBtn.disabled = true;
       try {
         const delRes = await fetch(`/api/photo/${encodeURIComponent(json.album)}/${encodeURIComponent(json.photoId)}`, {
@@ -196,7 +196,7 @@ async function uploadFile(file) {
         });
         if (!delRes.ok) {
           const text = await delRes.text();
-          alert(`Delete failed: ${delRes.status} ${text.slice(0, 200)}`);
+          alert(`Borttagning misslyckades: ${delRes.status} ${text.slice(0, 200)}`);
           delBtn.disabled = false;
           return;
         }
@@ -204,7 +204,7 @@ async function uploadFile(file) {
         uploaded--;
         updateSummary();
       } catch (err) {
-        alert(`Delete failed: ${err.message}`);
+        alert(`Borttagning misslyckades: ${err.message}`);
         delBtn.disabled = false;
       }
     });
@@ -215,7 +215,7 @@ async function uploadFile(file) {
     editBtn.className = 'edit';
     editBtn.type = 'button';
     editBtn.textContent = '✎';
-    editBtn.title = 'Edit photo';
+    editBtn.title = 'Redigera foto';
     editBtn.dataset.album = json.album;
     editBtn.dataset.photoId = json.photoId;
     editBtn.dataset.photographer = photographer;
@@ -234,7 +234,7 @@ async function uploadFile(file) {
 async function handleFiles(files) {
   if (!files.length) return;
   if (!albumSelect.value) {
-    alert('Pick or create an album first');
+    alert('Välj eller skapa ett album först');
     return;
   }
   if (!settings.reportValidity()) return;

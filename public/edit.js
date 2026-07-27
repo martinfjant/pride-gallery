@@ -31,7 +31,7 @@ function placeMarker(x, y) {
 
 function openEditModal(btn) {
   if (!passwordInput?.value) {
-    alert('Password required');
+    alert('Lösenord krävs');
     passwordInput?.focus();
     return;
   }
@@ -78,8 +78,8 @@ function applyToRow(btn, photographer, focal) {
   const meta = li.querySelector('.photo-meta');
   if (meta) {
     meta.textContent = needsName(photographer)
-      ? `Photo by ${NO_NAME} — click ✎ to name`
-      : `Photo by ${photographer}`;
+      ? `Foto av ${NO_NAME} — klicka på ✎ för att namnge`
+      : `Foto av ${photographer}`;
   }
   li.classList.toggle('needs-name', needsName(photographer));
 }
@@ -106,7 +106,7 @@ async function saveEdit() {
 
   editSaveBtn.disabled = true;
   focalClearBtn.disabled = true;
-  editSaveBtn.textContent = 'Saving…';
+  editSaveBtn.textContent = 'Sparar…';
   editSaveBtn.classList.add('is-saving');
   editError.textContent = '';
   const auth = `Bearer ${passwordInput.value}`;
@@ -144,7 +144,7 @@ async function saveEdit() {
   } finally {
     editSaveBtn.disabled = false;
     focalClearBtn.disabled = false;
-    editSaveBtn.textContent = 'Save';
+    editSaveBtn.textContent = 'Spara';
     editSaveBtn.classList.remove('is-saving');
   }
 }

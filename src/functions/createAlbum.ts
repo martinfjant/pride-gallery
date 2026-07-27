@@ -40,29 +40,29 @@ async function createAlbumHandler(request: HttpRequest, _context: InvocationCont
 
   const authFailure = checkUploadAuth(request);
   if (authFailure) {
-    return htmx ? fail('Password required or incorrect — check the password field at the top of the page.', 401) : authFailure;
+    return htmx ? fail('Lösenord saknas eller är felaktigt — kontrollera lösenordsfältet högst upp på sidan.', 401) : authFailure;
   }
 
   let body: Record<string, unknown>;
   try {
     body = await readBody(request);
   } catch {
-    return fail('expected JSON or form body', 400);
+    return fail('förväntade JSON- eller formulärdata', 400);
   }
 
   const { slug, name, description } = body;
 
   if (typeof slug !== 'string' || !SLUG_RE.test(slug)) {
-    return fail('Invalid slug (lowercase letters/digits/dashes, 1–60 chars, must start and end with alphanumeric).', 400);
+    return fail('Ogiltig slug (gemena bokstäver/siffror/bindestreck, 1–60 tecken, måste börja och sluta med bokstav eller siffra).', 400);
   }
   if (RESERVED_SLUGS.has(slug)) {
-    return fail(`"${slug}" is a reserved word and can't be used as an album slug.`, 400);
+    return fail(`"${slug}" är ett reserverat ord och kan inte användas som album-slug.`, 400);
   }
   if (typeof name !== 'string' || !name.trim() || name.length > NAME_MAX) {
-    return fail(`Name required, max ${NAME_MAX} chars.`, 400);
+    return fail(`Namn krävs, högst ${NAME_MAX} tecken.`, 400);
   }
   if (typeof description !== 'string' || !description.trim() || description.length > DESCRIPTION_MAX) {
-    return fail(`Description required, max ${DESCRIPTION_MAX} chars.`, 400);
+    return fail(`Beskrivning krävs, högst ${DESCRIPTION_MAX} tecken.`, 400);
   }
 
   const entity: AlbumEntity = {
@@ -78,7 +78,7 @@ async function createAlbumHandler(request: HttpRequest, _context: InvocationCont
     await table.createEntity(entity);
   } catch (err) {
     if (err instanceof RestError && err.statusCode === 409) {
-      return fail(`An album with the slug "${slug}" already exists.`, 409);
+      return fail(`Ett album med slug:en "${slug}" finns redan.`, 409);
     }
     throw err;
   }

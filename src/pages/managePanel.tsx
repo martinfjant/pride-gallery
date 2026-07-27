@@ -19,8 +19,8 @@ function PhotoRow({ album, photo }: { album: string; photo: PhotoRowData }): JSX
   const photographer = photo.photographer ?? '';
   const hasFocal = typeof photo.focalX === 'number' && typeof photo.focalY === 'number';
   const meta = needsName(photographer)
-    ? `Photo by ${NO_NAME} — click ✎ to name`
-    : `Photo by ${photographer}`;
+    ? `Foto av ${NO_NAME} — klicka på ✎ för att namnge`
+    : `Foto av ${photographer}`;
 
   return (
     <li class={needsName(photographer) ? 'needs-name' : undefined}>
@@ -28,7 +28,7 @@ function PhotoRow({ album, photo }: { album: string; photo: PhotoRowData }): JSX
         <img
           src={imageUrl('thumbnails', album, photoId, 'jpg')}
           alt=""
-          onerror="this.parentElement.textContent = 'no thumb'"
+          onerror="this.parentElement.textContent = 'ingen miniatyr'"
         />
       </div>
       <div class="info">
@@ -38,7 +38,7 @@ function PhotoRow({ album, photo }: { album: string; photo: PhotoRowData }): JSX
       <button
         type="button"
         class={hasFocal ? 'edit set' : 'edit'}
-        title="Edit photo"
+        title="Redigera foto"
         data-album={album}
         data-photo-id={photoId}
         data-photographer={photographer}
@@ -50,9 +50,9 @@ function PhotoRow({ album, photo }: { album: string; photo: PhotoRowData }): JSX
       <button
         type="button"
         class="del"
-        title="Remove photo"
+        title="Ta bort foto"
         hx-delete={`/api/photo/${encodeURIComponent(album)}/${encodeURIComponent(photoId)}`}
-        hx-confirm={`Remove ${photo.originalFilename || photoId}? This removes the original, thumbnail, and display copies.`}
+        hx-confirm={`Ta bort ${photo.originalFilename || photoId}? Detta tar bort originalet, miniatyren och visningskopiorna.`}
         hx-target="closest li"
         hx-swap="delete"
       >
@@ -66,14 +66,14 @@ export function ManageAlbumPanel({ album, photos }: { album: AlbumSummary; photo
   return (
     <>
       <div class="panel">
-        <h2>Album details</h2>
+        <h2>Albumdetaljer</h2>
         <form hx-patch={`/api/albums/${encodeURIComponent(album.slug)}`} hx-target="#edit-result" hx-swap="innerHTML">
           <label>
-            Name
+            Namn
             <input type="text" name="name" value={album.name} maxlength="120" required />
           </label>
           <label>
-            Description
+            Beskrivning
             <textarea name="description" maxlength="500" rows="2" required safe>{album.description}</textarea>
           </label>
           <div class="actions">
@@ -82,20 +82,20 @@ export function ManageAlbumPanel({ album, photos }: { album: AlbumSummary; photo
               class="del-album"
               style="margin-right: auto; color: var(--fail); border-color: var(--fail);"
               hx-delete={`/api/albums/${encodeURIComponent(album.slug)}`}
-              hx-confirm={`Delete "${album.name}" and all its photos? This cannot be undone.`}
+              hx-confirm={`Radera "${album.name}" och alla dess foton? Detta kan inte ångras.`}
             >
-              Delete album
+              Radera album
             </button>
-            <button type="submit" class="primary">Save changes</button>
+            <button type="submit" class="primary">Spara ändringar</button>
           </div>
         </form>
         <div class="saved" id="edit-result"></div>
       </div>
 
       <div class="panel">
-        <h2>Photos</h2>
+        <h2>Foton</h2>
         {photos.length === 0 ? (
-          <div class="panel-empty">No photos in this album.</div>
+          <div class="panel-empty">Inga foton i det här albumet.</div>
         ) : (
           <ul class="photos">
             {photos.map((photo) => (

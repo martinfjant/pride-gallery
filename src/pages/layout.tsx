@@ -10,7 +10,7 @@ export function Layout(props: PropsWithChildren<{ title: string; scripts?: strin
   return (
     <>
       {'<!doctype html>'}
-      <html lang="en">
+      <html lang="sv">
         <head>
           <meta charset="utf-8" />
           {/* viewport-fit=cover lets full-bleed backgrounds (and modal
@@ -47,9 +47,34 @@ export function Layout(props: PropsWithChildren<{ title: string; scripts?: strin
               endpoint. On every page via the shared Layout. */}
           <script data-goatcounter="https://stockholmpride.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
         </head>
-        <body>{props.children}</body>
+        <body>
+          {props.children}
+          <Footer />
+        </body>
       </html>
     </>
+  );
+}
+
+/**
+ * Site footer with the Stockholm Pride wordmark, centered. The <picture> serves
+ * the black-text logo in light mode and the white-text logo in dark mode via a
+ * prefers-color-scheme media source, so the browser fetches only the one that
+ * matches the visitor's theme.
+ */
+export function Footer(): JSX.Element {
+  return (
+    <footer class="site-footer">
+      <picture>
+        <source srcset={assetUrl('logo-dark.svg')} media="(prefers-color-scheme: dark)" />
+        <img class="footer-logo" src={assetUrl('logo-light.svg')} alt="Stockholm Pride" width="273" height="126" loading="lazy" />
+      </picture>
+      <nav class="footer-links">
+        <a href="https://stockholmpride.org">Stockholm Pride</a>
+        <a href="https://program.stockholmpride.org">Årets Program</a>
+        <a href="/api/upload-page">Admin</a>
+      </nav>
+    </footer>
   );
 }
 

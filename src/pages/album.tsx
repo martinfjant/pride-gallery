@@ -9,11 +9,11 @@ export type AlbumPhoto = { rowKey: string; photographer?: string; hasAvif?: bool
 export function AlbumPage({ album, photos }: { album: AlbumInfo | null; photos: AlbumPhoto[] }): JSX.Element {
   if (!album) {
     return (
-      <Layout title="Album not found — Stockholm Pride Gallery">
+      <Layout title="Albumet hittades inte — Stockholm Pride Gallery">
         <BrandBar />
         <main>
-          <a href="/" class="back">← All albums</a>
-          <h1>Album not found</h1>
+          <a href="/" class="back">← Alla album</a>
+          <h1>Albumet hittades inte</h1>
         </main>
       </Layout>
     );
@@ -23,11 +23,11 @@ export function AlbumPage({ album, photos }: { album: AlbumInfo | null; photos: 
     <Layout title={`${album.name} — Stockholm Pride Gallery`}>
       <BrandBar />
       <main>
-        <a href="/" class="back">← All albums</a>
+        <a href="/" class="back">← Alla album</a>
         <h1 safe>{album.name}</h1>
         <p class="desc" safe>{album.description}</p>
         {photos.length === 0 ? (
-          <p class="empty">No photos in this album yet.</p>
+          <p class="empty">Inga foton i det här albumet ännu.</p>
         ) : (
           <ul class="grid" id="grid">
             {photos.map((photo, i) => (
@@ -49,7 +49,7 @@ export function AlbumPage({ album, photos }: { album: AlbumInfo | null; photos: 
                     <source srcset={imageUrl('thumbnails', album.slug, photo.rowKey, 'webp')} type="image/webp" />
                     <img
                       src={imageUrl('thumbnails', album.slug, photo.rowKey, 'jpg')}
-                      alt={photo.photographer ? `Photo by ${photo.photographer}` : ''}
+                      alt={photo.photographer ? `Foto av ${photo.photographer}` : ''}
                       {...(i === 0
                         // The first thumbnail is the LCP element on an album page.
                         // Loading it eagerly (not lazy) and hinting high fetch
@@ -68,11 +68,11 @@ export function AlbumPage({ album, photos }: { album: AlbumInfo | null; photos: 
       </main>
       <dialog id="lightbox">
         <div class="box">
-          <button class="close" id="close" aria-label="Close">×</button>
+          <button class="close" id="close" aria-label="Stäng">×</button>
           <div class="image-area">
-            <button class="nav-btn prev" id="prev" aria-label="Previous">‹</button>
+            <button class="nav-btn prev" id="prev" aria-label="Föregående">‹</button>
             <img id="lightbox-img" alt="" />
-            <button class="nav-btn next" id="next" aria-label="Next">›</button>
+            <button class="nav-btn next" id="next" aria-label="Nästa">›</button>
           </div>
           <div class="caption" id="caption"></div>
         </div>

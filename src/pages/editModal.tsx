@@ -8,21 +8,21 @@ export function EditModal(): JSX.Element {
   return (
     <dialog id="edit-modal">
       <div class="edit-body">
-        <h2>Edit photo</h2>
+        <h2>Redigera foto</h2>
         <label class="edit-photographer-label">
-          Photographer
-          <input type="text" id="edit-photographer" maxlength="120" placeholder="Photographer name" />
+          Fotograf
+          <input type="text" id="edit-photographer" maxlength="120" placeholder="Fotografens namn" />
         </label>
-        <p class="focal-hint">Click the point that should stay centered in the square thumbnail crop.</p>
+        <p class="focal-hint">Klicka på punkten som ska vara centrerad i den fyrkantiga miniatyrbeskärningen.</p>
         <div class="focal-frame" id="focal-frame">
           <img id="focal-image" alt="" />
           <div class="focal-marker" id="focal-marker"></div>
         </div>
         <div class="edit-error" id="edit-error"></div>
         <div class="actions">
-          <button type="button" id="focal-clear">Clear focal point</button>
-          <button type="button" id="edit-cancel">Cancel</button>
-          <button type="button" id="edit-save" class="primary">Save</button>
+          <button type="button" id="focal-clear">Rensa fokuspunkt</button>
+          <button type="button" id="edit-cancel">Avbryt</button>
+          <button type="button" id="edit-save" class="primary">Spara</button>
         </div>
       </div>
     </dialog>
