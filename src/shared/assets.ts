@@ -35,9 +35,12 @@ const DEFS: AssetDef[] = [
   { key: 'upload.js', file: 'upload.js', contentType: 'text/javascript; charset=utf-8' },
   // Footer wordmark logos: black-text for light theme, white-text for dark. The
   // footer's <picture> element picks between them by prefers-color-scheme, so
-  // only the matching one is fetched.
-  { key: 'logo-light.svg', file: 'svg/Logga, färg, svart text, Stockholm Pride.svg', contentType: 'image/svg+xml; charset=utf-8' },
-  { key: 'logo-dark.svg', file: 'svg/Logga, färg, vit text, Stockholm Pride.svg', contentType: 'image/svg+xml; charset=utf-8' },
+  // only the matching one is fetched. Filenames are kept pure-ASCII on purpose:
+  // the source assets ship with åäö names, but macOS stores those NFD-decomposed
+  // while git/the deploy zip carry NFC bytes, so a non-ASCII string literal here
+  // fails to byte-match at readFileSync on the Linux host and crashes cold start.
+  { key: 'logo-light.svg', file: 'svg/logo-light.svg', contentType: 'image/svg+xml; charset=utf-8' },
+  { key: 'logo-dark.svg', file: 'svg/logo-dark.svg', contentType: 'image/svg+xml; charset=utf-8' },
 ];
 
 export interface Asset {
