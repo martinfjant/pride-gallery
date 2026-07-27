@@ -147,7 +147,12 @@ resource functionApp 'Microsoft.Web/sites@2023-12-01' = {
         { name: 'ALBUMS_TABLE', value: 'albums' }
         { name: 'UPLOAD_PASSWORD', value: uploadPassword }
         { name: 'ENABLE_DEBUG_ENDPOINTS', value: 'false' }
-        { name: 'PUBLIC_IMAGE_BASE', value: '' }
+        // PUBLIC_IMAGE_BASE is intentionally unset: the code defaults to '' →
+        // root-relative /thumbnails/… and /display/… URLs served from the cached
+        // Front Door `images` route (direct to Blob storage). An empty-string app
+        // setting would be dropped by Azure Functions and never reach the process,
+        // so we omit it rather than set value: '' (which silently did nothing and
+        // caused images to fall back to the uncached /api/image proxy).
         { name: 'APPLICATIONINSIGHTS_CONNECTION_STRING', value: appInsights.properties.ConnectionString }
       ]
     }
