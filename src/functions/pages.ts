@@ -83,7 +83,7 @@ async function galleryAlbumHandler(slug: string): Promise<HttpResponseInit> {
   const photos = await listPhotosData(slug);
   const ready = photos
     .filter((p) => p.status === 'ready' && p.thumbnailBlob && p.rowKey)
-    .sort((a, b) => ((a.uploadedAt ?? '') < (b.uploadedAt ?? '') ? -1 : 1))
+    .sort((a, b) => ((a.uploadedAt ?? '') > (b.uploadedAt ?? '') ? -1 : 1))
     .map((p) => ({ rowKey: p.rowKey as string, photographer: p.photographer, hasAvif: photoHasAvif(p) }));
 
   return serveHtml(AlbumPage({ album, photos: ready }));
