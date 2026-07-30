@@ -17,6 +17,6 @@ export async function listAlbumsData(): Promise<AlbumSummary[]> {
       createdAt: entity.createdAt,
     });
   }
-  albums.sort((a, b) => a.name.localeCompare(b.name));
+  albums.sort((a, b) => ((a.createdAt ?? '') > (b.createdAt ?? '') ? -1 : 1));
   return albums;
 }
